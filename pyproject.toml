@@ -13,9 +13,6 @@ authors = [
     { name = "Yashar" }
 ]
 
-[project.scripts]
-shortcut-engine-demo = "shortcut_engine.demo:main"
-
 keywords = [
     "shortcut",
     "keyboard",
@@ -60,3 +57,6 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.scripts]
+shortcut-engine-demo = "shortcut_engine.demo:main"
