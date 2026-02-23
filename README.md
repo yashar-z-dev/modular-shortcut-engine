@@ -1,299 +1,214 @@
-# 📘 README.md
+# Modular Gesture & Shortcut Detection Engine
+
+A time-aware, event-driven gesture detection engine that turns  
+keyboard input and mouse movement into structured signals —  
+without coupling detection to execution.
 
 ---
 
-# Modular Shortcut Engine
+## 🚀 What Makes It Different
 
-A dynamic, event-driven shortcut engine designed for real applications —
-not just simple key bindings.
+Unlike traditional shortcut libraries, this engine:
 
-This engine detects complex keyboard and mouse gestures, applies configurable policies (cooldown, rate limit, spam control), and publishes clean callback signals.
-You decide what to do with them.
+- Treats **mouse movement as a first-class signal** (e.g. `"move up 800px"`)
+- Uses a **time-aware state machine** for gesture detection
+- Filters OS noise and small jitter automatically
+- Separates **detection** from **execution**
+- Has a fully **OS-agnostic core**
+- Uses a deterministic, single-worker event pipeline
 
----
+It does not execute your logic.
 
-# 🚀 Why This Engine Exists
+It publishes clean callback signals.
 
-Most shortcut systems are:
-
-- Hardcoded
-- UI-coupled
-- Not extensible
-- Difficult to test
-- Limited to simple key combinations
-
-This engine is different.
-
-It separates:
-
-1. **Detection**
-2. **Spam filtering & policy**
-3. **Execution logic**
-4. **Application decision-making**
-
-So your program doesn’t deal with noisy OS input anymore.
-
-It simply receives:
-
-> "This shortcut was detected."
-
-And then you decide what to do.
+You control what happens next.
 
 ---
 
-# 🧠 Philosophy
-
-The engine is designed around one principle:
-
-> Input detection should not decide application behavior.
-
-The engine:
-
-- Detects gestures
-- Applies anti-spam logic
-- Publishes callback keys
-
-Your application:
-
-- Decides how to execute
-- Chooses thread model
-- Controls priority
-- Integrates with UI or backend
-- Injects dependencies dynamically
-
-This makes the engine:
-
-- UI-safe
-- Backend-safe
-- Game-loop-safe
-- Async-friendly
-- Testable
-
----
-
-# 🏗 Architecture Overview
+## 🧠 Mental Model
 
 ```
 OS Input
    ↓
-Listener (Adapter Layer)
+Adapter (normalization)
    ↓
-Pipeline (Gesture Detection)
+Gesture State Machine
    ↓
-Worker
+Policy Engine (cooldown / rate limit)
    ↓
-PolicyEngine (Cooldown / Rate Limit)
+Callback Publish
    ↓
-ActionBus (Publish)
-   ↓
-Your Application Logic
+Your Application
 ```
 
-The engine never executes your logic directly.
-
-It publishes callback keys.
-
----
-
-# ⚙️ What It Can Do
-
-✔ Keyboard sequences
-✔ Mouse gesture detection
-✔ Combined keyboard + mouse triggers
-✔ Cooldown per callback
-✔ Rate limit per callback
-✔ Dynamic JSON configuration
-✔ Dependency injection for actions
-✔ Plugin-style logic/action mapping
-✔ Event-driven (no polling loops required)
+The core engine contains **no OS-specific code**.  
+Only the adapter layer interacts with the operating system.
 
 ---
 
-# 🧩 Example Use Case
+## ⚡ Quick Example
 
-You define in config:
+### Minimal ESC trigger
 
-```json
-[
-  {
-    "keyboard": { "conditions": ["esc"] },
-    "callback": "exit"
-  }
+```python
+config = [
+    {
+        "keyboard": {"conditions": ["esc"]},
+        "mouse": {"conditions": []},
+        "policy": {"cooldown_seconds": 1.0},
+        "callback": "exit"
+    }
 ]
 ```
 
-When ESC is detected:
-
-- Detection layer confirms match
-- Policy layer verifies cooldown
-- Worker publishes `"exit"`
-- Your app decides what to do
-
-Your app might:
-
-- Close UI
-- Shutdown engine
-- Save state
-- Ignore it
-
-Engine doesn’t care.
-
 ---
 
-# 🔌 Integration Example
+### Mouse Gesture Example
+
+Trigger when user moves mouse **up at least 100px within 4 seconds**:
 
 ```python
-engine = ShortcutEngine(config, action_bus.publish)
-
-while running:
-    for cb_key in action_bus.drain():
-        orchestrator.execute_callback(cb_key)
+config = [
+    {
+        "keyboard": {"conditions": []},
+        "mouse": {
+            "conditions": [
+                {"axis": "y", "trend": "up", "min_delta": 100}
+            ]
+        },
+        "policy": {"cooldown_seconds": 2.0},
+        "callback": "mouse_up_100"
+    }
+]
 ```
 
-You control when and how callbacks execute.
+---
 
-Need UI main thread?
-Execute there.
+### Hybrid Trigger Example
 
-Need background thread?
-Execute there.
+CTRL + move mouse DOWN 20px (order doesn't matter):
 
-Need prioritization?
-Implement it.
-
-Engine stays clean.
+```python
+{
+    "keyboard": {"conditions": ["ctrl"]},
+    "mouse": {
+        "conditions": [
+            {"axis": "y", "trend": "down", "min_delta": 20}
+        ]
+    },
+    "policy": {"cooldown_seconds": 2.0},
+    "callback": "ctrl_plus_mouse_down_20"
+}
+```
 
 ---
 
-# 🧠 Why There Is No Forced Main Loop
+## 🧠 Gesture Detection Model
 
-Some libraries force execution immediately when a shortcut is detected.
+- Sequential state machine
+- Time-window constrained (default: 4 seconds)
+- Perceptual delta accumulation
+- Direction-aware path segmentation
+- Opposite significant movement breaks the path
+- Extremely slow movement does not trigger gestures
 
-This engine does not.
-
-Why?
-
-Because real applications need control:
-
-- UI frameworks require main-thread execution
-- Games use custom loops
-- Async apps use event loops
-- Backend services may batch events
-
-So the engine publishes signals.
-You decide scheduling.
+The engine evaluates **movement over time**, not just raw displacement.
 
 ---
 
-# 🧪 Testing Friendly
+## 🎯 Design Principles
 
-The engine does not depend on real OS time.
+- Detection ≠ Execution
+- Core ≠ OS
+- Policy ≠ Gesture Logic
+- Application owns scheduling
 
-You can inject time providers and simulate events.
-
-No global state.
-No hidden threads controlling behavior.
-
-Fully testable.
+No forced main loop.
+No automatic execution.
+No hidden threads controlling your logic.
 
 ---
 
-# 🔌 Adapter Layer
+## 🧪 Testing Friendly
 
-The core engine is OS-agnostic.
+- Injected time source
+- No global state
+- Deterministic processing order
+- Blocking queue worker (no polling)
 
-An official `pynput` adapter is provided for convenience.
+Fully unit-testable without real OS input.
 
-It:
+---
 
-- Normalizes noisy OS input
-- Fixes negative mouse edge values
-- Normalizes key combinations
-- Prevents duplicate ctrl+key artifacts
+## 🏗 Architecture Characteristics
 
-You can write your own adapter if needed.
+- Event-driven
+- Single worker (ordered processing)
+- No polling loops
+- Scales to hundreds of shortcuts
+- Latency typically imperceptible in real-world usage
+
+---
+
+## 🧵 Concurrency Model
+
+- Adapter listeners run in separate threads (managed by the adapter implementation)
+- Events are pushed into a blocking queue
+- A single worker thread processes events sequentially
+- Processing order is deterministic
+- The engine does **not** execute your callbacks inside its worker thread
+
+You remain in full control of execution scheduling.
+
+---
+
+## 🔌 Adapter Layer
+
+The official adapter uses `pynput`, but the core engine is independent.
+
+You may implement your own adapter for any platform.
 
 The only requirement:
 
-Produce normalized `EventData`.
+Produce normalized `KeyboardEvent` and `MouseEvent` objects.
 
 ---
 
-# 🎯 Designed For
+## 🎯 When To Use This
 
-- Desktop apps
-- Automation tools
-- Overlay systems
-- Games
-- Background services
-- Experimental UI systems
-- Modular plugin-based apps
+- You need mouse gesture detection
+- You need full control over execution timing
+- You build modular or plugin-based systems
+- You want testable input logic
 
 ---
 
-# 🧠 Advanced Design Feature
+## 🚫 When Not To Use This
 
-Each callback maps to:
-
-- Logic class
-- Action class
-- Dependency injection container
-
-Meaning even core behaviors (like exit) are injectable.
-
-The engine itself can be controlled by shortcuts.
+- You only need simple hotkeys
+- You want automatic callback execution
+- You prefer tightly UI-bound shortcuts
 
 ---
 
-# ⚡ Performance
+## 📚 Documentation
 
-- Fully event-driven
-- No polling
-- Minimal latency (<10ms typical)
-- Multi-thread friendly
-- No heavy locking
+Detailed design documentation is available in the `docs/` directory:
 
----
-
-# 🧩 Default Behavior Is Simple
-
-Although highly dynamic internally, it can be used in a minimal setup:
-
-```python
-engine = ShortcutEngine(config, publish)
-engine.start()
-```
-
-You don’t need to use advanced features unless you want to.
+- Architecture
+- Gesture model
+- Policy engine
+- Performance notes
+- Design decisions
 
 ---
 
-# 💡 What This Engine Solves
+## 📌 Final Thought
 
-It removes:
+This is not just a shortcut handler.
 
-- OS noise
-- Repeated trigger handling
-- Cooldown boilerplate
-- State tracking for spam prevention
-- Shortcut decision entanglement
-
-So your code becomes:
-
-> "When this shortcut happens, do X."
-
-Not:
-
-> "Check time… check state… ignore duplicates… handle spam…"
-
----
-
-# 📌 Final Thought
-
-This engine is not just a shortcut handler.
-
-It is an input runtime layer.
+It is a lightweight input runtime layer.
 
 Invisible when working.
-Powerful when needed.
-Flexible by design.
+Precise when needed.
+Modular by design.
