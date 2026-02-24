@@ -1,4 +1,4 @@
-from shortcut_engine.input.event_buffer import EventBuffer
+from gestura.input.event_buffer import EventBuffer
 import pytest
 
 

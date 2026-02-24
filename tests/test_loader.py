@@ -2,8 +2,8 @@ import json
 import logging
 from typing import get_args
 
-from shortcut_engine.models.mouse import GestureMouseValidator
-from shortcut_engine.config.parser import parse_shortcut_config
+from gestura.models.mouse import GestureMouseValidator
+from gestura.config.parser import parse_shortcut_config
 
 import pytest
 

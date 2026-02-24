@@ -1,6 +1,6 @@
-from shortcut_engine.models.combine import GestureCombine_KM
-from shortcut_engine.models.keyboard import GestureKeyboard
-from shortcut_engine.models.mouse import GestureMouse
+from gestura.models.combine import GestureCombine_KM
+from gestura.models.keyboard import GestureKeyboard
+from gestura.models.mouse import GestureMouse
 
 import pytest
 

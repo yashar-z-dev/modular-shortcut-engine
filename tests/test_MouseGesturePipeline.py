@@ -1,6 +1,6 @@
-from shortcut_engine.input.mouse.pipeline import MouseGesturePipeline
-from shortcut_engine.models.mouse import GestureMouseCondition
-from shortcut_engine.models.event import EventData_move
+from gestura.input.mouse.pipeline import MouseGesturePipeline
+from gestura.models.mouse import GestureMouseCondition
+from gestura.models.event import EventData_move
 
 import pytest
 

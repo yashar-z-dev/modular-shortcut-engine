@@ -4,7 +4,7 @@ import logging
 import time
 
 # API
-from shortcut_engine import ShortcutEngine, ActionEvent
+from gestura import GesturaEngine, ActionEvent
 
 
 class main:
@@ -18,12 +18,12 @@ class main:
 
     def _setup_engine(self):
         BASE_DIR = Path(__file__).resolve().parent
-        json_path = BASE_DIR / "examples" / "sample_config.json"
+        json_path = BASE_DIR / "sample_config.json"
 
         with open(json_path, "r", encoding="utf-8") as f:
             config = json.load(f)
 
-        self._ShortcutEngine = ShortcutEngine(config, self.pump_worker_events)
+        self._GesturaEngine = GesturaEngine(config, self.pump_worker_events)
 
     def pump_worker_events(self, action_event: ActionEvent):
         logging.info(action_event)
@@ -38,7 +38,7 @@ class main:
     def start(self):
         logging.info("Engine is Started...")
         self.app_state(True)
-        self._ShortcutEngine.start()
+        self._GesturaEngine.start()
         self._loop()
 
 if __name__ == "__main__":

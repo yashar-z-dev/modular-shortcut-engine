@@ -4,11 +4,11 @@ import logging
 import time
 
 # API
-from shortcut_engine import ShortcutEngine
+from gestura import GesturaEngine
 
-# Adapters
-from ..adapters.action_bus import ActionBus
-from ..adapters.callback_orchestrator import CallbackOrchestrator
+# Integration
+from gestura.integration.action_bus import ActionBus
+from gestura.integration.action_dispatcher import ActionDispatcher
 
 # Action definition
 from .exit import Logic_Exit, Action_Exit
@@ -34,31 +34,31 @@ class main:
 
     def _setup_engine(self):
         BASE_DIR = Path(__file__).resolve().parent
-        json_path = BASE_DIR / "examples" / "sample_config.json"
+        json_path = BASE_DIR / "sample_config.json"
 
         with open(json_path, "r", encoding="utf-8") as f:
             config = json.load(f)
 
-        self._ShortcutEngine = ShortcutEngine(config, self._ActionBus.publish)
+        self._GesturaEngine = GesturaEngine(config, self._ActionBus.publish)
 
     def _setup_shortcut_map(self):
-        self._CallbackOrchestrator = CallbackOrchestrator(self._setup_deps(), lambda _: None)
+        self._ActionDispatcher = ActionDispatcher(self._setup_deps(), lambda _: None)
 
     def _setup_deps(self) -> dict[str, object]:
         return {
             "fake_state": self.fake_state,
             "app_state": self.app_state,
-            "_ShortcutEngine": self._ShortcutEngine,
+            "_GesturaEngine": self._GesturaEngine,
             "_ActionBus": self._ActionBus,
             }
 
     def register_callbacks(self):
-        self._CallbackOrchestrator.register("exit", Logic_Exit, Action_Exit)
-        self._CallbackOrchestrator.register("pause", Logic_Pause, Action_Pause)
+        self._ActionDispatcher.register("exit", Logic_Exit, Action_Exit)
+        self._ActionDispatcher.register("pause", Logic_Pause, Action_Pause)
 
     def pump_worker_events(self):
         for cb_key in self._ActionBus.drain():
-            self._CallbackOrchestrator.execute_callback(cb_key)
+            self._ActionDispatcher.execute_callback(cb_key)
 
     def _loop(self):
         while self.running:
@@ -69,7 +69,7 @@ class main:
     def start(self):
         logging.info("Engine is Started...")
         self.app_state(True)
-        self._ShortcutEngine.start()
+        self._GesturaEngine.start()
         self._loop()
 
 if __name__ == "__main__":

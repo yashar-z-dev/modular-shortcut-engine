@@ -1,6 +1,6 @@
-from shortcut_engine.input.keyboard.pipeline import KeyboardGesturePipeline
-from shortcut_engine.models.keyboard import GestureKeyboardCondition
-from shortcut_engine.models.event import EventData_keyboard
+from gestura.input.keyboard.pipeline import KeyboardGesturePipeline
+from gestura.models.keyboard import GestureKeyboardCondition
+from gestura.models.event import EventData_keyboard
 
 import pytest
 

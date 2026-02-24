@@ -1,7 +1,6 @@
-# 85/100
-
+# type: ignore
 import logging
-from ..adapters.models import LogicResult
+from gestura.integration.models import LogicResult
 
 
 class Logic_Exit:
@@ -15,14 +14,14 @@ class Logic_Exit:
 class Action_Exit:
     def __init__(
         self,
-        _ShortcutEngine,
+        _GesturaEngine,
         app_state):
 
-        self._ShortcutEngine = _ShortcutEngine
+        self._GesturaEngine = _GesturaEngine
         self.app_state = app_state
 
     def execute(self, payload) -> None:
         logging.info("Engine is EXIT.")
 
-        self._ShortcutEngine.stop()
+        self._GesturaEngine.stop()
         self.app_state(False)

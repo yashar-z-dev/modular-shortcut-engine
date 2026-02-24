@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "shortcut-engine"
-version = "1.0.0"
+name = "gestura"
+version = "2.0.0"
 description = "A deterministic, rate-controlled shortcut detection engine for keyboard and mouse events."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,12 +15,14 @@ authors = [
 ]
 
 keywords = [
-    "shortcut",
-    "keyboard",
-    "mouse",
-    "event-driven",
-    "automation",
-    "engine"
+    "gesture",
+    "input-recognition",
+    "human-input",
+    "mouse-gesture",
+    "keyboard-gesture",
+    "event-engine",
+    "policy-engine",
+    "automation"
 ]
 
 classifiers = [
@@ -49,10 +51,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yashar-z-dev/shortcut-engine"
-Repository = "https://github.com/yashar-z-dev/shortcut-engine"
-Issues = "https://github.com/yashar-z-dev/shortcut-engine/issues"
-Documentation = "https://github.com/yashar-z-dev/shortcut-engine#readme"
+Homepage = "https://github.com/yashar-z-dev/gestura"
+Repository = "https://github.com/yashar-z-dev/gestura"
+Issues = "https://github.com/yashar-z-dev/gestura/issues"
+Documentation = "https://github.com/yashar-z-dev/gestura#readme"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -61,7 +63,7 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-shortcut_engine = ["py.typed"]
+gestura = ["py.typed"]
 
 [project.scripts]
-shortcut-engine-demo = "shortcut_engine.demo:main"
+gestura-demo = "gestura.demo:main"

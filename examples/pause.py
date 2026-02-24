@@ -1,6 +1,5 @@
-# 85/100
-
-from ..adapters.models import LogicResult
+# type: ignore
+from gestura.integration.models import LogicResult
 
 
 class Logic_Pause:

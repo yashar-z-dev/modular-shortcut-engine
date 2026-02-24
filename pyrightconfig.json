@@ -2,9 +2,19 @@
     "typeCheckingMode": "strict",
     "reportMissingImports": true,
     "reportMissingTypeStubs": false,
-    "reportUnusedImport": false,
-    "reportUnknownParameterType": false,
+    "reportMissingParameterType": true,
+    "reportUnknownLambdaType": true,
     "reportUnknownVariableType": false,
     "reportUnknownMemberType": false,
-    "reportUnknownArgumentType": false
+    "reportUnknownArgumentType": false,
+    "reportUnknownParameterType": false,
+    "reportUnusedImport": true,
+    "reportUnusedVariable": true,
+    "reportPrivateUsage": true,
+    "reportIncompatibleMethodOverride": true,
+    "reportInconsistentConstructor": true,
+    "reportUnnecessaryTypeIgnoreComment": true,
+    // Optional
+    "reportImplicitOverride": true,
+    "reportUninitializedInstanceVariable": true
 }

@@ -1,4 +1,4 @@
-from shortcut_engine.utils.key_normalizer import KeyUtils, Key, KeyCode
+from gestura.utils.key_normalizer import KeyUtils, Key, KeyCode
 import pytest
 
 
