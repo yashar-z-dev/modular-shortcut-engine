@@ -1,3 +1,4 @@
+from typing import Any
 from pathlib import Path
 import json
 import logging
@@ -11,8 +12,8 @@ from gestura.integration.action_bus import ActionBus
 from gestura.integration.action_dispatcher import ActionDispatcher
 
 # Action definition
-from .exit import Logic_Exit, Action_Exit
-from .pause import Logic_Pause, Action_Pause
+from exit import Logic_Exit, Action_Exit
+from pause import Logic_Pause, Action_Pause
 
 
 class AppState:
@@ -25,24 +26,22 @@ class main:
         self.fake_state = AppState()
 
         self._ActionBus = ActionBus()
-        self._setup_engine()
-        self._setup_shortcut_map()
+        # _setup_engine
+        self._GesturaEngine = GesturaEngine(self._load_config(), self._ActionBus.publish)
+        # _setup_shortcut_map
+        self._ActionDispatcher = ActionDispatcher(self._setup_deps())
         self.register_callbacks()
 
     def app_state(self, state: bool):
         self.running = state
 
-    def _setup_engine(self):
+    def _load_config(self) -> list[dict[str, Any]]:
         BASE_DIR = Path(__file__).resolve().parent
         json_path = BASE_DIR / "sample_config.json"
 
         with open(json_path, "r", encoding="utf-8") as f:
             config = json.load(f)
-
-        self._GesturaEngine = GesturaEngine(config, self._ActionBus.publish)
-
-    def _setup_shortcut_map(self):
-        self._ActionDispatcher = ActionDispatcher(self._setup_deps(), lambda _: None)
+        return config
 
     def _setup_deps(self) -> dict[str, object]:
         return {
@@ -56,8 +55,10 @@ class main:
         self._ActionDispatcher.register("exit", Logic_Exit, Action_Exit)
         self._ActionDispatcher.register("pause", Logic_Pause, Action_Pause)
 
+    # ===== start =====#
     def pump_worker_events(self):
         for cb_key in self._ActionBus.drain():
+            # Execute action
             self._ActionDispatcher.execute_callback(cb_key)
 
     def _loop(self):
